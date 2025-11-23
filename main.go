@@ -1,6 +1,17 @@
 package main
-import "fmt"
+import (
+	"fmt";
+  "strings"
+)
 
-main() {
-	return fmt.Printf("Hello, World!")		
+func main() {
+}
+
+func cleanInput(text string) []string {
+  slice := []string{}
+  if text == ""{
+		return slice
+	}
+	slice = strings.Fields(strings.ToLower(text))
+	return slice
 }
