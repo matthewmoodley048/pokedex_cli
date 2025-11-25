@@ -6,22 +6,35 @@ import (
 	"strings"
 )
 
+type cliCommand struct {
+	name        string
+	description string
+	callback    func() error
+}
+
 func main() {
 	fmt.Print("Pokedex > ")
 	scanner := bufio.NewScanner(os.Stdin)
 
-	map[string] cliCommand {
+ commands:=	map[string] cliCommand {
     	"exit": {
         	name:        "exit",
       	  description: "Exit the Pokedex",
     	    callback:    commandExit,
   	  },
+			"help": {
+					name:				 "help",
+					description: "Displays a help message",
+					callback: 	 commanHelp,
+			},
 	}
 
 	for scanner.Scan() {
-		if cliCommand[scanner.Text()] != nil{
-			return cliCommand[scanner.Text()].callback
-		}
+		if c,ok:= commands[scanner.Text()]; ok{
+	    if err := c.callback(); err != nil {
+      	  fmt.Println(err)
+  	  }
+		}    
 		fmt.Print("Pokedex > ")
 	}
 
@@ -42,10 +55,25 @@ func cleanInput(text string) []string {
 }
 
 
-type cliCommand struct {
-	name        string
-	description string
-	callback    func() error
+func commanHelp() error {
+	fmt.Println("Welcome to the Pokedex! \nUsage:\n")	
+	commands:=	map[string] cliCommand {
+    	"exit": {
+        	name:        "exit",
+      	  description: "Exit the Pokedex",
+    	    callback:    commandExit,
+  	  },
+			"help": {
+					name:				 "help",
+					description: "Displays a help message",
+					callback: 	 commanHelp,
+			},
+	}
+
+	for _, command := range commands{
+		fmt.Printf("%s: %s \n", command.name, command.description)
+	}
+	return nil
 }
 
 func commandExit() error {
