@@ -1,39 +1,53 @@
 package main
+
 import (
 	"bufio"
 	"fmt"
 	"os"
 	"strings"
+	"time"
+
+	"github.com/matthewmoodley048/pokedex_cli/internal"
 )
 
 func main() {
-	cfg := &LocationConfig{}
+	cache := internal.NewCache(5 * time.Minute)
+
+	cfg := &internal.LocationConfig{
+		Cache: cache,
+	}
+
+	commands := internal.GetCommands()
 	scanner := bufio.NewScanner(os.Stdin)
 
 	for {
 		fmt.Print("Pokedex > ")
 		scanner.Scan()
 		input := scanner.Text()
+		input = strings.TrimSpace(input)
 
-		cmd, ok := getCommands()[input]
-		if !ok {
-			fmt.Println("Unknown command")
+		if input == "" {
 			continue
 		}
 
-		if err := cmd.callback(cfg); err != nil {
-			fmt.Println("Error:", err)
+		parts := strings.Fields(input)
+		commandName := strings.ToLower(parts[0])
+		var args []string
+		if len(parts) > 1 {
+			args = parts[1:]
+		}
+
+		command, exists := commands[commandName]
+		if !exists {
+			fmt.Println("Unknown command. Type 'help' for available commands.")
+			continue
+		}
+
+		cfg.ExploreArgs = args
+
+		err := command.Callback(cfg)
+		if err != nil {
+			fmt.Printf("Error: %v\n", err)
 		}
 	}
 }
-
-func cleanInput(text string) []string {
-  slice := []string{}
-  if text == ""{
-		return slice
-	}
-	slice = strings.Fields(strings.ToLower(text))
-	return slice
-}
-
-
