@@ -44,6 +44,7 @@ func main() {
 		}
 
 		cfg.ExploreArgs = args
+		cfg.PokemonArgs = args
 
 		err := command.Callback(cfg)
 		if err != nil {
